@@ -1,0 +1,37 @@
+if [ -z "$BASH" ]; then
+  printf "This bash library will only work with BASH.\n"
+  exit 1
+fi
+
+if ((BASH_VERSINFO[0] < 4)); then
+  printf "This bash library expects at least BASH v4.\n"
+  exit 1
+fi
+
+$(return 2> /dev/null) && SOURCED=1 || SOURCED=0
+
+if [ $SOURCED -eq 0 ]; then
+  # Do I need to check shopt -p extglob here?
+  # Do I need to check shopt -p nocasematch here?
+
+  echo "@: $@"
+
+#  if [[ "$@" =~ (-\?|-h|--help) ]]; then
+  if [[ "$@" =~ --?[\?h](elp)? ]]; then
+    echo "help goes here"
+  else
+    echo "error goes here"
+  fi
+
+  exit
+
+fi
+
+echo 'done'
+
+# XXX: Are we being sourced?
+#        If not, are we being asked for help?
+#          If yes, display usage
+#          otherwise, display error.
+#          Exit
+
