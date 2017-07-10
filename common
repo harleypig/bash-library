@@ -1,0 +1,11 @@
+[[ $BASH_LIBRARY_DEBUG ]] && echo "Cheking for bash ..."
+if [ -z "$BASH" ]; then
+  printf "This bash library will only work with BASH.\n"
+  exit 1
+fi
+
+[[ $BASH_LIBRARY_DEBUG ]] && echo "Checking for bash version ..."
+if ((BASH_VERSINFO[0] < 4)); then
+  printf "This bash library expects at least BASH v4.\n"
+  exit 1
+fi
