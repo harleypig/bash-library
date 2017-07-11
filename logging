@@ -4,24 +4,51 @@ REAL_PATH=$(dirname $(realpath ${BASH_SOURCE[0]}))
 [[ $BASH_LIBRARY_DEBUG ]] && echo source $REAL_PATH/common
 source $REAL_PATH/common
 
-$(return 2> /dev/null) && SOURCED=1 || SOURCED=0
+$(return 2> /dev/null) && SOURCED=0 || SOURCED=1
 
-if [ $SOURCED -eq 0 ]; then
+if ((SOURCED)); then
   if [[ "$@" =~ --?[\?h](elp)? ]]; then
     echo "help goes here"
   else
     echo "error goes here"
   fi
 
-  exit
-
+  exit 1
 fi
 
-echo 'done'
+# XXX: Think of a better default log filename, or just fail if none set.
 
-# XXX: Are we being sourced?
-#        If not, are we being asked for help?
-#          If yes, display usage
-#          otherwise, display error.
-#          Exit
+# Where do we save the log messages?
+LOG_FILENAME='/tmp/somefile.log'
 
+# Any valid date format string will work here.
+LOG_PREFIX_TIMESTAMP='%Y%m%d_%H%M%S'
+
+# How long do we wait for input to log? (in seconds)
+LOG_READ_TIMEOUT=1
+
+# XXX: Make log_prefix more flexible, to allow user configuration.
+
+# This function should not be run by any function except those found in this file.
+function _logit {
+  local log_type=$1 ; shift
+  local log_date=$(date +"$LOG_PREFIX_TIMESTAMP")
+  local log_prefix="[${log_date}][${log_type]:"
+  local log_this
+
+  if [ -z "$1" ]; then
+    # Are we being redirected to?
+    read -t $LOG_READ_TIMEOUT log_this
+  else
+    log_this="$@"
+  fi
+
+  # XXX: Split input by new lines and add prefix to each line.
+  printf '%s %s' "$log_prefix" "$log_this"
+
+}
+
+function log_info  { _logit 'INFO' "$@" }
+function log_warn  { _logit 'WARN' "$@" }
+function log_debug { _logit 'DEBUG' "$@" }
+function log_fatal { _logit 'FATAL' "$@" }
