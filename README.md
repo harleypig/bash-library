@@ -7,6 +7,8 @@ This library attempts to be as minimal as possible while providing routines that
 
 Then source whichever library files you need and start coding.
 
-  source /path/to/library/logging
-  info executing foo ...
-  foo > $LOG
+```
+source /path/to/library/logging
+info executing foo ...
+foo > $LOG
+```
